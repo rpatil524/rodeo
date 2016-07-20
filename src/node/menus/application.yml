@@ -90,6 +90,14 @@
       accelerator: CmdOrCtrl+4
       click:
         type: FOCUS_NEWEST_PLOT
+  - label: New Window
+    submenu:
+    - label: Plots
+      click:
+        type: CREATE_NEW_PLOTS_WINDOW
+    - label: Variables
+      click:
+        type: CREATE_NEW_VARIABLES_WINDOW
   - label: Toggle Full Screen
     accelerator: Command+Shift+F
     click:

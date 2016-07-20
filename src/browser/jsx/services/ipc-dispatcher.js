@@ -30,7 +30,9 @@ const dispatchMap = {
     FOCUS_ACTIVE_TERMINAL: () => terminalActions.focus(),
     FOCUS_NEWEST_PLOT: () => plotViewerActions.focusNewestPlot(),
     TERMINAL_INTERRUPT: () => terminalActions.interrupt(),
-    TERMINAL_RESTART: () => terminalActions.restart()
+    TERMINAL_RESTART: () => terminalActions.restart(),
+    CREATE_NEW_PLOTS_WINDOW: () => applicationActions.createNewPlotsWindow(),
+    CREATE_NEW_VARIABLES_WINDOW: () => applicationActions.createNewVariablesWindow()
   },
   iopubDispatchMap = {
     execute_input: dispatchIOPubExecuteInput,

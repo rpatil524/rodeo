@@ -58,6 +58,22 @@ function quitAndInstallUpdates() {
   };
 }
 
+function createNewPlotsWindow() {
+  return function () {
+    applicationControl.createWindow('abc', {
+      url: 'freeTabsOnlyWindow'
+    });
+  };
+}
+
+function createNewVariablesWindow() {
+  return function () {
+    applicationControl.createWindow('def', {
+      url: 'freeTabsOnlyWindow'
+    });
+  };
+}
+
 export function errorCaught(error) {
   track({category: 'application', action: 'error_caught'});
   /* eslint no-console: 0 */
@@ -67,6 +83,8 @@ export function errorCaught(error) {
 
 export default {
   checkForUpdates,
+  createNewPlotsWindow,
+  createNewVariablesWindow,
   errorCaught,
   quit,
   quitAndInstallUpdates,
