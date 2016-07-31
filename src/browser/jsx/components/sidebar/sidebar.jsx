@@ -9,6 +9,7 @@ import logoPython from './logo-python.svg';
 import logoScienceOps from './logo-scienceops.png';
 import actions from './sidebar.actions';
 import dialogActions from '../../actions/dialogs';
+import commonReact from '../../services/common-react';
 
 const showClass = 'sidebar-show';
 
@@ -52,6 +53,9 @@ export default connect(mapStateToProps, mapDispatchToProps)(React.createClass({
     const el = ReactDOM.findDOMNode(this);
 
     _.defer(() => el.classList.add(showClass));
+  },
+  shouldComponentUpdate(nextProps, nextState) {
+    return !commonReact.shallowCompare(this, nextProps, nextState);
   },
   render: function () {
     const props = this.props;

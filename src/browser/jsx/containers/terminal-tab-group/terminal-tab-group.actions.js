@@ -11,9 +11,10 @@ const convertor = new AsciiToHtml(),
   inputBuffer = [];
 
 function getJQConsole(id) {
-  const el = document.querySelector('#' + id);
+  const el = document.querySelector('#' + id),
+    terminalEl = el && el.querySelector('.terminal');
 
-  return el && $(el).data('jqconsole');
+  return terminalEl && $(terminalEl).data('jqconsole');
 }
 
 function startPrompt(jqConsole) {
@@ -27,7 +28,6 @@ function startPrompt(jqConsole) {
 
     _.defer(() => {
       if (inputBuffer.length && jqConsole.GetState() === 'prompt') {
-        console.log('running buffer', _.map(inputBuffer, 'text'));
         dispatch(addInputText(inputBuffer.shift()));
       }
     });
@@ -178,7 +178,7 @@ function appendSVG(dispatch, jqConsole, data) {
 }
 
 /**
- * Update the terminal with display data
+ * Update a terminal with display data
  * @param {object} data
  * @returns {function}
  */
@@ -211,9 +211,7 @@ function interrupt() {
       consoleState = jqConsole.GetState();
 
     client.interrupt()
-      .catch(function (error) {
-        return dispatch(errorCaught(error));
-      });
+      .catch(error => dispatch(errorCaught(error)));
     if (consoleState !== 'output') {
       jqConsole.ClearPromptText();
     }
@@ -224,29 +222,36 @@ function restart() {
   return function (dispatch, getState) {
     const state = getState(),
       terminal = _.head(state.terminals),
-      jqConsole = getJQConsole(terminal.id);
+      jqConsole = terminal && getJQConsole(terminal.id);
 
-    if (jqConsole.GetState() === 'prompt') {
-      jqConsole.AbortPrompt();
+    if (jqConsole) {
+      if (jqConsole.GetState() === 'prompt') {
+        jqConsole.AbortPrompt();
+      }
+      jqConsole.Write('restarting terminal... ');
+
+      client.restartInstance()
+        .then(() => {
+          jqConsole.Write('done\n');
+          _.defer(() => dispatch(startPrompt(jqConsole)));
+        })
+        .catch(error => dispatch(errorCaught(error)));
+    } else {
+      dispatch(errorCaught(new Error('Cannot restart without terminal')));
     }
-    jqConsole.Write('restarting terminal... ');
-
-    client.restartInstance()
-      .then(function () {
-        jqConsole.Write('done\n');
-        _.defer(() => dispatch(startPrompt(jqConsole)));
-      })
-      .catch(error => dispatch(errorCaught(error)));
   };
 }
 
-function focus() {
+function focus(groupId, id) {
   return function (dispatch, getState) {
     const state = getState(),
-      terminal = _.head(state.terminals),
+      terminal = _.head(state.terminalTabGroup),
       jqConsole = getJQConsole(terminal.id);
 
+    // side-effect?
     jqConsole.Focus();
+
+    dispatch({type: 'FOCUS_TAB', groupId, id});
   };
 }
 
